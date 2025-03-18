@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Розрахунок витрат</title>
+</head>
+<body>
+
+<div class="container">
+    <h1>Розрахунок витрат</h1>
+
+    <!-- Введення даних -->
+    <div class="input-group">
+        <label for="athletes">Кількість атлетів:</label>
+        <input type="number" id="athletes" value="15">
+    </div>
+
+    <div class="input-group">
+        <label for="coaches">Кількість тренерів:</label>
+        <input type="number" id="coaches" value="5">
+    </div>
+
+    <div class="input-group">
+        <label for="days">Кількість днів:</label>
+        <input type="number" id="days" value="15">
+    </div>
+
+    <div class="input-group">
+        <label for="twinPrice">Ціна за TWIN (двомісний номер зі сніданком):</label>
+        <input type="number" id="twinPrice" value="190">
+    </div>
+
+    <div class="input-group">
+        <label for="sglPrice">Ціна за SGL (одномісний номер зі сніданком):</label>
+        <input type="number" id="sglPrice" value="150">
+    </div>
+
+    <div class="input-group">
+        <label for="transferAirportPrice">Ціна трансферу готель-аеропорт (за одну поїздку):</label>
+        <input type="number" id="transferAirportPrice" value="800">
+    </div>
+
+    <div class="input-group">
+        <label for="transferPoolPrice">Ціна трансферу готель-басейн-готель (за одну поїздку, до 20 осіб):</label>
+        <input type="number" id="transferPoolPrice" value="250">
+    </div>
+
+    <div class="input-group">
+        <label for="busRentPrice">Ціна оренди автобуса на день (для більше 20 осіб):</label>
+        <input type="number" id="busRentPrice" value="800">
+    </div>
+
+    <div class="input-group">
+        <label for="lunchPrice">Ціна обіду (за одну особу):</label>
+        <input type="number" id="lunchPrice" value="35">
+    </div>
+
+    <div class="input-group">
+        <label for="dinnerPrice">Ціна вечері (за одну особу):</label>
+        <input type="number" id="dinnerPrice" value="45">
+    </div>
+
+    <div class="input-group">
+        <label for="gymPrice">Ціна за оренду тренажерного залу (за 2 години):</label>
+        <input type="number" id="gymPrice" value="200">
+    </div>
+
+    <div class="input-group">
+        <label for="poolPricePerLane">Ціна за оренду доріжки в басейні (за годину):</label>
+        <input type="number" id="poolPricePerLane" value="35">
+    </div>
+
+    <button onclick="calculate()">Розрахувати</button>
+
+    <!-- Результати -->
+    <div class="result">
+        <h2>Результати розрахунків:</h2>
+        <p><strong>Проживання (TWIN):</strong> <span id="accommodationTwin"></span></p>
+        <p><strong>Проживання (SGL):</strong> <span id="accommodationSgl"></span></p>
+        <p><strong>Трансфер готель-аеропорт:</strong> <span id="transferAirport"></span></p>
+        <p><strong>Трансфер готель-басейн-готель:</strong> <span id="transferPool"></span></p>
+        <p><strong>Обід:</strong> <span id="lunch"></span></p>
+        <p><strong>Вечеря:</strong> <span id="dinner"></span></p>
+        <p><strong>Тренажерний зал:</strong> <span id="gym"></span></p>
+        <p><strong>Басейн:</strong> <span id="pool"></span></p>
+        <p><strong>Сума послуг:</strong> <span id="servicesSubtotal"></span></p>
+        <p><strong>Загальна сума:</strong> <span id="total"></span></p>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        // Отримання значень з полів введення
+        const athletes = parseInt(document.getElementById('athletes').value);
+        const coaches = parseInt(document.getElementById('coaches').value);
+        const days = parseInt(document.getElementById('days').value);
+        const twinPrice = parseInt(document.getElementById('twinPrice').value);
+        const sglPrice = parseInt(document.getElementById('sglPrice').value);
+        const transferAirportPrice = parseInt(document.getElementById('transferAirportPrice').value);
+        const transferPoolPrice = parseInt(document.getElementById('transferPoolPrice').value);
+        const busRentPrice = parseInt(document.getElementById('busRentPrice').value);
+        const lunchPrice = parseInt(document.getElementById('lunchPrice').value);
+        const dinnerPrice = parseInt(document.getElementById('dinnerPrice').value);
+        const gymPrice = parseInt(document.getElementById('gymPrice').value);
+        const poolPricePerLane = parseInt(document.getElementById('poolPricePerLane').value);
+
+        // Розрахунок кількості номерів
+        const twinRooms = Math.floor(athletes / 2); // Кількість TWIN номерів
+        const sglRooms = (athletes % 2 === 0) ? 0 : 1; // Якщо кількість атлетів непарна, то один SGL
+
+        // Розрахунок вартості проживання
+        const accommodationTwin = twinRooms * twinPrice * days;
+        const accommodationSgl = (sglRooms + coaches) * sglPrice * days; // Додаємо тренерів до SGL
+
+        // Розрахунок вартості трансферу готель-аеропорт
+        const transferAirport = transferAirportPrice * 2; // Туди і назад
+
+        // Розрахунок вартості трансферу готель-басейн-готель
+        const totalPeople = athletes + coaches; // Загальна кількість людей
+        const transferPool = (totalPeople > 20) 
+            ? busRentPrice * 12 // Якщо більше 20 осіб, орендуємо автобус на день за $800 (12 днів)
+            : transferPoolPrice * 23; // Якщо менше або дорівнює 20 осіб, оплачуємо $250 за поїздку (23 рази)
+
+        // Розрахунок вартості харчування
+        const lunch = (athletes + coaches) * lunchPrice * (days - 1); // Один обід пропускається
+        const dinner = (athletes + coaches) * dinnerPrice * days;
+
+        // Розрахунок вартості тренажерного залу
+        const gym = gymPrice * 9; // 9 відвідувань (як у вашому прикладі)
+
+        // Розрахунок вартості басейну
+        const poolLanes = Math.ceil(athletes / 3); // 3 особи на доріжку
+        const pool = poolLanes * poolPricePerLane * 2 * 23; // 2 години на день, 23 дні
+
+        // Сума послуг
+        const servicesSubtotal = transferAirport + transferPool + lunch + dinner + gym + pool;
+
+        // Загальна вартість
+        const total = accommodationTwin + accommodationSgl + servicesSubtotal;
+
+        // Виведення результатів
+        document.getElementById('accommodationTwin').innerText = `${accommodationTwin}`;
+        document.getElementById('accommodationSgl').innerText = `${accommodationSgl}`;
+        document.getElementById('transferAirport').innerText = `${transferAirport}`;
+        document.getElementById('transferPool').innerText = `${transferPool}`;
+        document.getElementById('lunch').innerText = `${lunch}`;
+        document.getElementById('dinner').innerText = `${dinner}`;
+        document.getElementById('gym').innerText = `${gym}`;
+        document.getElementById('pool').innerText = `${pool}`;
+        document.getElementById('servicesSubtotal').innerText = `${servicesSubtotal}`;
+        document.getElementById('total').innerText = `${total}`;
+    }
+</script>
+
+</body>
+</html>
